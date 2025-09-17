@@ -1,9 +1,8 @@
 import sys
 from os.path import isfile
-import msvcrt
 from typing import List
 from globals import GLOBALS
-from base_events import handle_base_events, initBuffers, get_max_digit_number
+from base_events import handle_base_events, initBuffers, get_max_digit_number, getch
 from ui import clear, render
 from modules import handle_modules
 
@@ -34,7 +33,7 @@ def main(argv: List[str]):
     run = True
 
     while run:
-        char = msvcrt.getch()
+        char = getch()
 
         override = handle_modules(char)
         
