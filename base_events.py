@@ -24,7 +24,7 @@ def get_max_digit_number(integer: int)->int:
     else:   return None
 
 def getch(nb_chars_to_read: int = 1):
-    if sys.platform == "win23":
+    if sys.platform == "win32":
         buffer = b""
         for i in range(nb_chars_to_read):
             buffer += msvcrt.getch()
@@ -58,7 +58,6 @@ def handle_bottom_arrow():
         GLOBALS["LINE_INDEX"] += 1
         if GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] > len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]]):
             GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] = len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])
-        GLOBALS["NEW_LINE_LENGTH"] = len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])
         initBuffers()
 
 def handle_top_arrow():
@@ -67,7 +66,6 @@ def handle_top_arrow():
         GLOBALS["LINE_INDEX"] -= 1
         if GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] > len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]]):
             GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] = len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])
-        GLOBALS["NEW_LINE_LENGTH"] = len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])
         initBuffers()
 
 def handle_ctrl_left_arrow():
@@ -107,7 +105,6 @@ def handle_end_key():
     GLOBALS["LINE_BUFFER_RIGHT"] = ""
 
 def handle_base_events(char: chr)->bool:
-        GLOBALS["NEW_LINE_LENGTH"] = GLOBALS["LINE_LENGTH"]
         
         if char == GLOBALS["ESCAPE_KEY"]:
             if sys.platform == "win":   return False
@@ -178,13 +175,11 @@ def handle_base_events(char: chr)->bool:
                     GLOBALS["BUFFER"].pop(GLOBALS["LINE_INDEX"])
                     GLOBALS["COLUMN_INDEX"].pop(GLOBALS["LINE_INDEX"])
                     GLOBALS["LINE_INDEX"] -= 1
-                    GLOBALS["NEW_LINE_LENGTH"] = len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])
                     initBuffers()
                     GLOBALS["NUMBER_OF_DIGITS"] = get_max_digit_number(len(GLOBALS["BUFFER"]))   
                     GLOBALS["IS_FILE_SAVED"] = False
             else:
                 GLOBALS["LINE_BUFFER_LEFT"] = GLOBALS["LINE_BUFFER_LEFT"][:-1]
-                GLOBALS["NEW_LINE_LENGTH"] -= 1
                 GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] -= 1
                 GLOBALS["IS_FILE_SAVED"] = False
 
@@ -193,7 +188,6 @@ def handle_base_events(char: chr)->bool:
             GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]] = GLOBALS["LINE_BUFFER_LEFT"]
             GLOBALS["BUFFER"].insert(GLOBALS["LINE_INDEX"]+1,GLOBALS["LINE_BUFFER_RIGHT"])
             GLOBALS["LINE_INDEX"] += 1
-            GLOBALS["NEW_LINE_LENGTH"] = len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])
             initBuffers()
             GLOBALS["NUMBER_OF_DIGITS"] = get_max_digit_number(len(GLOBALS["BUFFER"]))
             GLOBALS["IS_FILE_SAVED"] = False
@@ -207,11 +201,9 @@ def handle_base_events(char: chr)->bool:
         elif char == GLOBALS["TAB_KEY"]:
             GLOBALS["LINE_BUFFER_LEFT"] += "    "
             GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] += 4
-            GLOBALS["NEW_LINE_LENGTH"] += 4
             GLOBALS["IS_FILE_SAVED"] = False
         else:
             GLOBALS["LINE_BUFFER_LEFT"] += char.decode("cp437","replace")
             GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] += 1
-            GLOBALS["NEW_LINE_LENGTH"] += 1
             GLOBALS["IS_FILE_SAVED"] = False
         return True

@@ -3,31 +3,46 @@ from os.path import isfile
 from typing import List
 from globals import GLOBALS
 from base_events import handle_base_events, initBuffers, get_max_digit_number, getch
-from ui import clear, render
+from ui import clear, render,enter_fullscreen,exit_fullscreen
 from modules import handle_modules
 
-def openFile(filename: str):
+from pygments import highlight
+from pygments.lexers import get_lexer_for_filename
+from pygments.formatters import TerminalFormatter
+
+def openFile(filename: str,line_index: int = 0):
     if not isfile(filename):
         open(filename,"w").close()
 
     GLOBALS["FILENAME"]=filename
     with open(filename,"r") as f:
         GLOBALS["BUFFER"] = f.read().split("\n")
-    GLOBALS["LINE_LENGTH"] = len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])
-    GLOBALS["NEW_LINE_LENGTH"] = GLOBALS["LINE_LENGTH"]
+
+    GLOBALS["LINE_INDEX"] = line_index
     GLOBALS["NUMBER_OF_DIGITS"] = get_max_digit_number(len(GLOBALS["BUFFER"]))
     GLOBALS["IS_FILE_SAVED"] = True
-    GLOBALS["COLUMN_INDEX"] = [0] * len(GLOBALS["BUFFER"])
+
+    GLOBALS["COLUMN_INDEX"] = []
+    for line in GLOBALS["BUFFER"]:
+        GLOBALS["COLUMN_INDEX"].append(len(line))
+
+    GLOBALS["LEXER"] = get_lexer_for_filename(filename)
     initBuffers()
 
-def init(filename: str):
-    openFile(filename)
+def init(argv: List[str]):
+    if len(argv) > 1:   filename = argv[1]
+    else:   filename = "newfile"
+
+    if len(argv) > 2:   line_index = max(0,int(argv[2])-1)
+    else:   line_index = 0
+
+    openFile(filename,line_index)
 
 def main(argv: List[str]):
-    if len(argv) > 1:   init(argv[1])
-    else:   init("newfile")
+    init(argv)
     
-    clear()
+    enter_fullscreen()
+
     render()
     
     run = True
@@ -41,8 +56,10 @@ def main(argv: List[str]):
             run = handle_base_events(char)
         
         render()
-        GLOBALS["LINE_LENGTH"] = GLOBALS["NEW_LINE_LENGTH"]
-    clear()
+    
+    exit_fullscreen()
+    # if GLOBALS["IS_FILE_SAVED"]:
+    #     print(highlight("\n".join(GLOBALS["BUFFER"]),GLOBALS["LEXER"],TerminalFormatter()))
 
 if __name__ == "__main__":
     main(sys.argv)
