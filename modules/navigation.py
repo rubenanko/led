@@ -1,7 +1,7 @@
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(__file__,"../..")))
 
-from base_events import handle_left_arrow, handle_right_arrow, handle_top_arrow, handle_bottom_arrow, handle_ctrl_left_arrow, handle_ctrl_right_arrow
+from base_events import handle_left_arrow, handle_right_arrow, handle_top_arrow, handle_bottom_arrow, handle_ctrl_left_arrow, handle_ctrl_right_arrow, handle_begining_key
 from globals import GLOBALS
 
 OPENING_BRACKETS = ["(","[","{","'",'"']
@@ -21,7 +21,9 @@ def entrypoint(char: bytes)->bool:
                 GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] += jump
                 GLOBALS["LINE_BUFFER_LEFT"] += GLOBALS["LINE_BUFFER_RIGHT"][:jump]
                 GLOBALS["LINE_BUFFER_RIGHT"] = GLOBALS["LINE_BUFFER_RIGHT"][jump:]
-
+        else:
+            handle_begining_key()
+            entrypoint(char)
         return True
     elif char == GLOBALS["CTRL_K_KEY"]:
         handle_left_arrow()

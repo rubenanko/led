@@ -202,8 +202,12 @@ def handle_base_events(char: chr)->bool:
             GLOBALS["LINE_BUFFER_LEFT"] += "    "
             GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] += 4
             GLOBALS["IS_FILE_SAVED"] = False
+
+        
         else:
-            GLOBALS["LINE_BUFFER_LEFT"] += char.decode("cp437","replace")
-            GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] += 1
-            GLOBALS["IS_FILE_SAVED"] = False
+            char_decoded = char.decode("utf-8","replace")
+            if char_decoded.isprintable():
+                GLOBALS["LINE_BUFFER_LEFT"] += char_decoded
+                GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] += 1
+                GLOBALS["IS_FILE_SAVED"] = False
         return True
