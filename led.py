@@ -7,7 +7,7 @@ from ui import clear, render,enter_fullscreen,exit_fullscreen
 from modules import handle_modules
 
 from pygments import highlight
-from pygments.lexers import get_lexer_for_filename
+from pygments.lexers import get_lexer_for_filename, TextLexer
 from pygments.formatters import TerminalFormatter
 
 def openFile(filename: str,line_index: int = 0):
@@ -26,7 +26,11 @@ def openFile(filename: str,line_index: int = 0):
     for line in GLOBALS["BUFFER"]:
         GLOBALS["COLUMN_INDEX"].append(len(line))
 
-    GLOBALS["LEXER"] = get_lexer_for_filename(filename)
+    try:
+        GLOBALS["LEXER"] = get_lexer_for_filename(filename)
+    except Exception:
+        GLOBALS["LEXER"] = TextLexer()
+
     initBuffers()
 
 def init(argv: List[str]):
