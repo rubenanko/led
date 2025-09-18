@@ -43,7 +43,7 @@ def render(updateBuffer:bool = True):
 
     displayed_lines_number += 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])) // columns_number
 
-    file_highlighted_buffer = f'{top_file_buffer if len(top_file_buffer) > 0 else ""}\x1b[1;31m{GLOBALS["LINE_INDEX"]+1}{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(GLOBALS["LINE_INDEX"]+1))} > \x1b[7;39m{GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]]}{fill_line(len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n{bottom_file_buffer}'
+    file_highlighted_buffer = f'{top_file_buffer if len(top_file_buffer) > 0 else ""}\x1b[1;31m{GLOBALS["LINE_INDEX"]+1}{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(GLOBALS["LINE_INDEX"]+1))} > \x1b[7;39m{GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]]}\x1b[0;0m{fill_line(len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n{bottom_file_buffer}'
 
     #actual rendering
     print(f'\x1b[1;1f\x1b[0;33m{GLOBALS["LINE_INDEX"]+1}\x1b[0;0m{" " * (GLOBALS["NUMBER_OF_DIGITS"] - current_digit_number)} {save_status_char} {highlighted_buffer}{" " * ((columns_number - 3 - GLOBALS["NUMBER_OF_DIGITS"] - len(GLOBALS["LINE_BUFFER_LEFT"] + GLOBALS["LINE_BUFFER_RIGHT"])) % columns_number)}\n{"-"*columns_number}\n{file_highlighted_buffer}{" "*(lines_number-displayed_lines_number)*columns_number}{cursor_coordinates}',end="",flush=True)

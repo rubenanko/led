@@ -1,19 +1,27 @@
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(__file__,"../..")))
 
-from base_events import initBuffers, handle_left_arrow, handle_right_arrow, handle_top_arrow, handle_bottom_arrow, handle_ctrl_left_arrow, handle_ctrl_right_arrow
+from base_events import handle_left_arrow, handle_right_arrow, handle_top_arrow, handle_bottom_arrow, handle_ctrl_left_arrow, handle_ctrl_right_arrow
 from globals import GLOBALS
+
+OPENING_BRACKETS = ["(","[","{","'",'"']
+CLOSING_BRACKETS = [")","]","}","'",'"']
 
 def entrypoint(char: bytes)->bool:
     if char == GLOBALS["CTRL_W_KEY"]:
         if len(GLOBALS["LINE_BUFFER_RIGHT"]):
             jump = 1
-            while jump < (len(GLOBALS["LINE_BUFFER_RIGHT"])-1) and GLOBALS["LINE_BUFFER_RIGHT"][jump-1] != "(" and GLOBALS["LINE_BUFFER_RIGHT"][jump] != ")":
+            while jump < (len(GLOBALS["LINE_BUFFER_RIGHT"])-1) and (not GLOBALS["LINE_BUFFER_RIGHT"][jump-1] in OPENING_BRACKETS) and (not GLOBALS["LINE_BUFFER_RIGHT"][jump] in CLOSING_BRACKETS):
                 jump += 1
 
-            if GLOBALS["LINE_BUFFER_RIGHT"][jump-1] == "(" or GLOBALS["LINE_BUFFER_RIGHT"][jump] == ")":
+
+
+            # if jump < (len(GLOBALS["LINE_BUFFER_RIGHT"])) and GLOBALS["LINE_BUFFER_RIGHT"][jump-1] in OPENING_BRACKETS or GLOBALS["LINE_BUFFER_RIGHT"][jump] in CLOSING_BRACKETS:
+            if jump < (len(GLOBALS["LINE_BUFFER_RIGHT"])):
                 GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] += jump
-                initBuffers()
+                GLOBALS["LINE_BUFFER_LEFT"] += GLOBALS["LINE_BUFFER_RIGHT"][:jump]
+                GLOBALS["LINE_BUFFER_RIGHT"] = GLOBALS["LINE_BUFFER_RIGHT"][jump:]
+
         return True
     elif char == GLOBALS["CTRL_K_KEY"]:
         handle_left_arrow()
