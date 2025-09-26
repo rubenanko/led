@@ -18,7 +18,7 @@ def exit_fullscreen():
 def fill_line(strlen:int,columns_number:int):
     return " " * (columns_number - (strlen % columns_number))
 
-def render(updateBuffer:bool = True):
+def render():
     columns_number = get_terminal_size().columns
     lines_number = get_terminal_size().lines
     displayed_lines_number = 1 + 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["LINE_BUFFER_LEFT"] + GLOBALS["LINE_BUFFER_RIGHT"])) // columns_number
@@ -28,20 +28,29 @@ def render(updateBuffer:bool = True):
     highlighted_buffer = highlight(GLOBALS["LINE_BUFFER_LEFT"] + GLOBALS["LINE_BUFFER_RIGHT"],GLOBALS["LEXER"],TerminalFormatter())[:-1]
     
     #building the file display buffer
-    inf = max(0,GLOBALS["LINE_INDEX"]-(lines_number//3))
-    sup = min(len(GLOBALS["BUFFER"]),GLOBALS["LINE_INDEX"]+(lines_number//3) + max(0,-GLOBALS["LINE_INDEX"]+(lines_number//3)))
+    inf = max(0,GLOBALS["LINE_INDEX"]-((lines_number-displayed_lines_number)//2))
+    sup = min(len(GLOBALS["BUFFER"]),GLOBALS["LINE_INDEX"]+((lines_number-displayed_lines_number)//2) + max(0,-GLOBALS["LINE_INDEX"] + ((lines_number-displayed_lines_number)//2)) - 1)
+
+    # current line
+    displayed_lines_number += 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])) // columns_number
 
     top_file_buffer = ""
-    for index in range(inf,GLOBALS["LINE_INDEX"]):
-        displayed_lines_number += 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["BUFFER"][index])) // columns_number
-        top_file_buffer += f'\x1b[0;33m{index+1}\x1b[0;0m{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(index+1))}\x1b[1;34m ~\x1b[0;0m {highlight(GLOBALS["BUFFER"][index],GLOBALS["LEXER"],TerminalFormatter())[:-1]}{fill_line(len(GLOBALS["BUFFER"][index])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n'
-            
+    for index in range(GLOBALS["LINE_INDEX"]-1,inf-1,-1):
+        tmp = 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["BUFFER"][index])) // columns_number
+        if (displayed_lines_number + tmp) -2 >= lines_number:
+            break
+        displayed_lines_number += tmp  
+        top_file_buffer = f'\x1b[0;33m{index+1}\x1b[0;0m{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(index+1))}\x1b[1;34m ~\x1b[0;0m {highlight(GLOBALS["BUFFER"][index],GLOBALS["LEXER"],TerminalFormatter())[:-1]}{fill_line(len(GLOBALS["BUFFER"][index])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n{top_file_buffer}'
+
     bottom_file_buffer = ""
     for index in range(GLOBALS["LINE_INDEX"]+1,sup):
-        displayed_lines_number += 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["BUFFER"][index])) // columns_number
+        tmp = 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["BUFFER"][index])) // columns_number
+        if (displayed_lines_number + tmp ) >= lines_number:  
+            break
+        displayed_lines_number += tmp
         bottom_file_buffer += f'\x1b[0;33m{index+1}\x1b[0;0m{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(index+1))}\x1b[1;34m ~\x1b[0;0m {highlight(GLOBALS["BUFFER"][index],GLOBALS["LEXER"],TerminalFormatter())[:-1]}{fill_line(len(GLOBALS["BUFFER"][index])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n'
 
-    displayed_lines_number += 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])) // columns_number
+    # bottom_file_buffer += " " * (columns_number * (displayed_lines_number - lines_number) - 1)
 
     file_highlighted_buffer = f'{top_file_buffer if len(top_file_buffer) > 0 else ""}\x1b[1;31m{GLOBALS["LINE_INDEX"]+1}{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(GLOBALS["LINE_INDEX"]+1))} > \x1b[7;39m{GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]]}\x1b[0;0m{fill_line(len(GLOBALS["BUFFER"][GLOBALS["LINE_INDEX"]])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n{bottom_file_buffer}'
 

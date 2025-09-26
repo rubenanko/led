@@ -5,6 +5,7 @@ GLOBALS = {}
 #globals
 GLOBALS["FILENAME"] = None
 GLOBALS["BUFFER"]: List[str] = None #lines of the opened file
+GLOBALS["MODULE_BUFFER"]: List[str] = None # a display for modules
 GLOBALS["LINE_BUFFER_LEFT"]: str = None
 GLOBALS["LINE_BUFFER_RIGHT"]: str = None
 GLOBALS["LINE_INDEX"]: int = 0
