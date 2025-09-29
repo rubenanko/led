@@ -39,18 +39,20 @@ def init(argv: List[str]):
 
     if len(argv) > 2:   line_index = max(0,int(argv[2])-1)
     else:   line_index = 0
-
+            
     openFile(filename,line_index)
 
 def main(argv: List[str]):
+    #opening the file and initializing the buffers, configuration
     init(argv)
-    
+    #switching to the alternative buffer
     enter_fullscreen()
-
+    #first rendering
     render()
     
     run = True
 
+    #main loop of the program
     while run:
         char = getch()
 
@@ -62,8 +64,6 @@ def main(argv: List[str]):
         render()
     
     exit_fullscreen()
-    # if GLOBALS["IS_FILE_SAVED"]:
-    #     print(highlight("\n".join(GLOBALS["BUFFER"]),GLOBALS["LEXER"],TerminalFormatter()))
 
 if __name__ == "__main__":
     main(sys.argv)

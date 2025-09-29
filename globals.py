@@ -1,4 +1,8 @@
 from typing import List
+import sys, os
+import json
+
+CONFIG_PATH = os.path.abspath(os.path.join(__file__,"../config.json"))
 
 GLOBALS = {}
 
@@ -49,3 +53,7 @@ GLOBALS["CTRL_D_KEY"] = b"\x04"
 GLOBALS["CTRL_C_KEY"] = b"\x03"
 GLOBALS["CTRL_X_KEY"] = b"\x18"
 GLOBALS["CTRL_V_KEY"] = b"\x16"
+
+# reading the configuration
+with open(CONFIG_PATH,"r") as config:
+        CONFIG = json.loads(config.read())

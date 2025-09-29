@@ -1,10 +1,10 @@
-from globals import GLOBALS
+from globals import GLOBALS,CONFIG
 from base_events import get_max_digit_number
 from sys import platform
 from os import get_terminal_size,system
 from pygments import highlight
 from pygments.lexers import get_lexer_for_filename
-from pygments.formatters import TerminalFormatter
+from pygments.formatters import Terminal256Formatter
 
 def clear():
     system("clear")
@@ -25,7 +25,7 @@ def render():
     save_status_char = "\x1b[1;32m~\x1b[0;0m" if GLOBALS["IS_FILE_SAVED"] else "\x1b[1;35m~\x1b[0;0m"
     current_digit_number = get_max_digit_number(GLOBALS["LINE_INDEX"]+1)
     cursor_coordinates = f'\x1b[{1 + (GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] + GLOBALS["NUMBER_OF_DIGITS"] + 3) // columns_number};{1 + (GLOBALS["COLUMN_INDEX"][GLOBALS["LINE_INDEX"]] + GLOBALS["NUMBER_OF_DIGITS"] + 3) % columns_number}f'
-    highlighted_buffer = highlight(GLOBALS["LINE_BUFFER_LEFT"] + GLOBALS["LINE_BUFFER_RIGHT"],GLOBALS["LEXER"],TerminalFormatter())[:-1]
+    highlighted_buffer = highlight(GLOBALS["LINE_BUFFER_LEFT"] + GLOBALS["LINE_BUFFER_RIGHT"],GLOBALS["LEXER"],Terminal256Formatter(style=CONFIG["code-color-scheme"]))[:-1]
     
     #building the file display buffer
     inf = max(0,GLOBALS["LINE_INDEX"]-((lines_number-displayed_lines_number)//2))
@@ -37,10 +37,10 @@ def render():
     top_file_buffer = ""
     for index in range(GLOBALS["LINE_INDEX"]-1,inf-1,-1):
         tmp = 1 + (3 + GLOBALS["NUMBER_OF_DIGITS"] + len(GLOBALS["BUFFER"][index])) // columns_number
-        if (displayed_lines_number + tmp) -2 >= lines_number:
+        if (displayed_lines_number + tmp) >= lines_number:
             break
         displayed_lines_number += tmp  
-        top_file_buffer = f'\x1b[0;33m{index+1}\x1b[0;0m{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(index+1))}\x1b[1;34m ~\x1b[0;0m {highlight(GLOBALS["BUFFER"][index],GLOBALS["LEXER"],TerminalFormatter())[:-1]}{fill_line(len(GLOBALS["BUFFER"][index])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n{top_file_buffer}'
+        top_file_buffer = f'\x1b[0;33m{index+1}\x1b[0;0m{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(index+1))}\x1b[1;34m ~\x1b[0;0m {highlight(GLOBALS["BUFFER"][index],GLOBALS["LEXER"],Terminal256Formatter(style=CONFIG["code-color-scheme"]))[:-1]}{fill_line(len(GLOBALS["BUFFER"][index])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n{top_file_buffer}'
 
     bottom_file_buffer = ""
     for index in range(GLOBALS["LINE_INDEX"]+1,sup):
@@ -48,7 +48,7 @@ def render():
         if (displayed_lines_number + tmp ) >= lines_number:  
             break
         displayed_lines_number += tmp
-        bottom_file_buffer += f'\x1b[0;33m{index+1}\x1b[0;0m{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(index+1))}\x1b[1;34m ~\x1b[0;0m {highlight(GLOBALS["BUFFER"][index],GLOBALS["LEXER"],TerminalFormatter())[:-1]}{fill_line(len(GLOBALS["BUFFER"][index])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n'
+        bottom_file_buffer += f'\x1b[0;33m{index+1}\x1b[0;0m{" " * (GLOBALS["NUMBER_OF_DIGITS"] - get_max_digit_number(index+1))}\x1b[1;34m ~\x1b[0;0m {highlight(GLOBALS["BUFFER"][index],GLOBALS["LEXER"],Terminal256Formatter(style=CONFIG["code-color-scheme"]))[:-1]}{fill_line(len(GLOBALS["BUFFER"][index])+ 3 + GLOBALS["NUMBER_OF_DIGITS"],columns_number)}\n'
 
     # bottom_file_buffer += " " * (columns_number * (displayed_lines_number - lines_number) - 1)
 
